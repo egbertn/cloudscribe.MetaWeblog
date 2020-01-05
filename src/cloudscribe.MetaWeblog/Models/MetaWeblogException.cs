@@ -24,6 +24,6 @@ namespace cloudscribe.MetaWeblog.Models
         ///     Gets code is actually for Fault Code.  It will be passed back in the 
         ///     response along with the error message.
         /// </summary>
-        public string Code { get; private set; }
+        public string Code { get; }
     }
 }

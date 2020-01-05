@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace cloudscribe.MetaWeblog
+﻿namespace cloudscribe.MetaWeblog
 {
     public class MetaWeblogSecurityResult
     {
@@ -15,43 +10,22 @@ namespace cloudscribe.MetaWeblog
             bool canEditPages
             )
         {
-            this.displayName = displayName;
-            this.blogId = blogId;
-            this.isAuthenticated = isAuthenticated;
-            this.canEditPosts = canEditPosts;
-            this.canEditPages = canEditPages;
+            this.DisplayName = displayName;
+            this.BlogId = blogId;
+            this.IsAuthenticated = isAuthenticated;
+            this.CanEditPosts = canEditPosts;
+            this.CanEditPages = canEditPages;
         }
 
-        private string displayName = string.Empty;
-        private string blogId = string.Empty;
-        private bool isAuthenticated = false;
-        private bool canEditPosts = false;
-        private bool canEditPages = false;
+        public string DisplayName { get; }
 
-        public string DisplayName
-        {
-            get { return displayName; }
-        }
-
-        public string BlogId
-        {
-            get { return blogId; }
-        }
+		public string BlogId { get; }
 
 
-        public bool IsAuthenticated
-        {
-            get { return isAuthenticated; }
-        }
+		public bool IsAuthenticated { get; }
 
-        public bool CanEditPosts
-        {
-            get { return canEditPosts; }
-        }
+		public bool CanEditPosts { get; }
 
-        public bool CanEditPages
-        {
-            get { return canEditPages; }
-        }
-    }
+		public bool CanEditPages { get; }
+	}
 }

@@ -13,8 +13,8 @@ namespace cloudscribe.MetaWeblog
 {
     public class XmlResult : ActionResult
     {
-        public XDocument Xml { get; private set; }
-        public string ContentType { get; set; }
+        public XDocument Xml { get; }
+        public string ContentType { get; }
         //public Encoding Encoding { get; set; }
 
         public XmlResult(XDocument xml)
@@ -33,10 +33,8 @@ namespace cloudscribe.MetaWeblog
 
             context.HttpContext.Response.ContentType = this.ContentType;
             if (Xml != null)
-            {
-                
+            {                
                 Xml.Save(context.HttpContext.Response.Body, SaveOptions.DisableFormatting);
-
             }
         }
         //#endif

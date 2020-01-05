@@ -49,14 +49,14 @@ namespace cloudscribe.MetaWeblog.Controllers
            
         }
 
-        protected IWebHostEnvironment HostingEnvironment { get; private set; }
-        protected ApiOptions ApiOptions { get; private set; }
-        protected IMetaWeblogSecurity Security { get; private set; }
-        protected IMetaWeblogRequestProcessor RequestProcessor { get; private set; }
-        protected IMetaWeblogRequestParser RequestParser { get; private set; }
-        protected IMetaWeblogResultFormatter ResultFormatter { get; private set; }
-        protected IMetaWeblogRequestValidator RequestValidator { get; private set; }
-        protected ILogger Log { get; private set; }
+        protected IWebHostEnvironment HostingEnvironment { get; }
+        protected ApiOptions ApiOptions { get; }
+        protected IMetaWeblogSecurity Security { get; }
+        protected IMetaWeblogRequestProcessor RequestProcessor { get; }
+        protected IMetaWeblogRequestParser RequestParser { get; }
+        protected IMetaWeblogResultFormatter ResultFormatter { get; }
+        protected IMetaWeblogRequestValidator RequestValidator { get; }
+        protected ILogger Log { get; }
 
 
         [HttpPost]
@@ -65,8 +65,8 @@ namespace cloudscribe.MetaWeblog.Controllers
         {
             CancellationToken cancellationToken = HttpContext?.RequestAborted ?? CancellationToken.None;
 
-            var dumpFileBasePath = HostingEnvironment.ContentRootPath
-                + ApiOptions.AppRootDumpFolderVPath.Replace('/', Path.DirectorySeparatorChar);
+            var dumpFileBasePath = Path.Combine( HostingEnvironment.ContentRootPath,
+				ApiOptions.AppRootDumpFolderVPath);
 
             XDocument postedXml = null;
             XDocument resultXml;
@@ -76,9 +76,9 @@ namespace cloudscribe.MetaWeblog.Controllers
             {
                 using (HttpContext.Request.Body)
                 {
-                    //https://stackoverflow.com/questions/47735133/asp-net-core-synchronous-operations-are-disallowed-call-writeasync-or-set-all
+                   
                     postedXml = await XDocument.LoadAsync(HttpContext.Request.Body, LoadOptions.None, default);
-                    // you need to set AllowSynchronousIO to true to get line above working
+                   
                 }
             }
             catch (Exception ex)
@@ -87,7 +87,7 @@ namespace cloudscribe.MetaWeblog.Controllers
 
                 if (ApiOptions.DumpRequestXmlToDisk)
                 {
-                    var requestFileName = dumpFileBasePath + "request-with-error" + Utils.GetDateTimeStringForFileName(true) + ".txt";
+                    var requestFileName = Path.Combine( dumpFileBasePath , "request-with-error" + Utils.GetDateTimeStringForFileName(true) + ".txt");
                     using var s = System.IO.File.Create(requestFileName);
                     //postedXml.Save(s, SaveOptions.None);
                     await HttpContext.Request.Body.CopyToAsync(s);
@@ -110,10 +110,10 @@ namespace cloudscribe.MetaWeblog.Controllers
 
             if (ApiOptions.DumpRequestXmlToDisk)
             {
-                var requestFileName = dumpFileBasePath + "request-" 
+                var requestFileName = Path.Combine(dumpFileBasePath , "request-" 
                     + Utils.GetDateTimeStringForFileName(true)  + "-"
                     + metaWeblogRequest.MethodName.Replace(".","-")
-                    + ".xml";
+                    + ".xml");
                 using var s = System.IO.File.Create(requestFileName);
                 //await postedXml.SaveAsync(s, SaveOptions.None, default);
                 var xmlWriter = XmlWriter.Create(s, settings: new XmlWriterSettings { Async = true });
@@ -153,13 +153,12 @@ namespace cloudscribe.MetaWeblog.Controllers
 
             if (ApiOptions.DumpResponseXmlToDisk)
             {
-                var reseponseFileName = dumpFileBasePath + "response-" 
+                var reseponseFileName = Path.Combine(dumpFileBasePath , "response-" 
                     + Utils.GetDateTimeStringForFileName(true) + "-"
                     + outCome.Method.Replace(".", "-") 
-                    + ".xml";
+                    + ".xml");
 
                 using var s = System.IO.File.Create(reseponseFileName);
-                // await resultXml.SaveAsync(s, SaveOptions.None, default);
                 var xmlWriter = XmlWriter.Create(s, settings: new XmlWriterSettings { Async = true });
                 await resultXml.WriteToAsync(xmlWriter, default);
                 await xmlWriter.FlushAsync();
